@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¿Quieres ser mi San Valentín? 💕</title>
     <style>
+        /* --- ESTILOS GENERALES --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -20,16 +21,19 @@
             position: relative;
         }
 
+        /* Capa de fondo para la lluvia */
         #lluviaFondo {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 1;
         }
 
+        /* Contenedores de las pantallas */
         .container-base {
             text-align: center; background: rgba(255, 255, 255, 0.95);
             padding: 40px 20px; border-radius: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             width: 90%; max-width: 600px; z-index: 10; margin: 20px;
+            position: relative;
         }
 
         h1, h2 { color: #ff1744; margin-bottom: 20px; }
@@ -37,6 +41,7 @@
         
         @keyframes latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
+        /* --- BOTONES --- */
         .botones { display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
         button {
             padding: 15px 30px; font-size: 1.2em; border: none; border-radius: 15px;
@@ -47,10 +52,11 @@
         .btn-no { background: #f44336; color: white; position: relative; }
         .btn-nosotros { background: #ff6b9d; color: white; margin-top: 30px; width: 100%; }
 
+        /* --- TICKETS --- */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
         .ticket { background: linear-gradient(135deg, #ff6b9d, #c06c84); color: white; padding: 15px; border-radius: 12px; text-align: left; }
 
-        /* --- CARRUSEL ANIMADO --- */
+        /* --- CARRUSEL --- */
         .carrusel-wrapper {
             position: relative; width: 100%; overflow: hidden;
             border-radius: 20px; background: #000; margin: 20px 0;
@@ -60,7 +66,6 @@
             display: flex; overflow-x: auto; scroll-behavior: smooth;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
         }
-
         .carrusel-container::-webkit-scrollbar { display: none; }
 
         .carrusel-slide {
@@ -68,12 +73,10 @@
             display: flex; justify-content: center; align-items: center;
             height: 400px;
         }
+        .carrusel-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .carrusel-slide img {
-            max-width: 100%; max-height: 100%; object-fit: contain;
-        }
-
-        .corazon-fondo { position: absolute; font-size: 2em; animation: caer 4s linear infinite; opacity: 0.6; }
+        /* --- ANIMACIÓN DE CAIDA --- */
+        .elemento-caida { position: absolute; font-size: 2em; animation: caer 4s linear infinite; opacity: 0.6; }
         @keyframes caer { 0% { transform: translateY(-10vh); opacity: 0; } 100% { transform: translateY(110vh); opacity: 0; } }
 
         .hidden { display: none !important; }
@@ -131,6 +134,7 @@
         let contadorRechazos = 0;
         let musicaUnoIniciada = false;
         let autoplayInterval;
+        let emojiActual = '❤️'; // Emoji por defecto
 
         const audios = {
             uno: document.getElementById('musicaUno'),
@@ -139,20 +143,31 @@
             dos: document.getElementById('musicaDos')
         };
 
+        // --- LÓGICA DE LA LLUVIA ---
         function crearLluvia() {
             const fondo = document.getElementById('lluviaFondo');
             setInterval(() => {
                 const c = document.createElement('div');
-                c.className = 'corazon-fondo';
-                c.textContent = '❤️';
+                c.className = 'elemento-caida';
+                c.textContent = emojiActual; // Usa el emoji configurado actualmente
                 c.style.left = Math.random() * 100 + 'vw';
                 c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                c.style.fontSize = (Math.random() * 20 + 20) + 'px'; // Tamaño variable
                 fondo.appendChild(c);
+                
+                // Elimina el elemento después de caer
                 setTimeout(() => c.remove(), 4000);
-            }, 400);
+            }, 300);
         }
         crearLluvia();
 
+        function cambiarLluvia(tipo) {
+            const fondo = document.getElementById('lluviaFondo');
+            fondo.innerHTML = ''; // Limpia los emojis anteriores instantáneamente
+            emojiActual = tipo;
+        }
+
+        // --- MÚSICA Y NAVEGACIÓN ---
         function iniciarMusicaUno() {
             if (!musicaUnoIniciada) {
                 audios.uno.play().catch(() => {});
@@ -174,11 +189,18 @@
                 document.getElementById('preguntaContainer').classList.add('hidden');
                 document.getElementById('gifContainer').classList.remove('hidden');
                 audios.triste.play();
+                
+                // CAMBIO A CORAZONES ROTOS
+                cambiarLluvia('💔');
             } else {
                 const btn = document.getElementById('btnNo');
+                const container = document.getElementById('preguntaContainer').getBoundingClientRect();
+                const maxX = container.width - 100;
+                const maxY = container.height - 50;
+                
                 btn.style.position = 'absolute';
-                btn.style.left = Math.random() * 70 + '%';
-                btn.style.top = Math.random() * 70 + '%';
+                btn.style.left = Math.random() * maxX + 'px';
+                btn.style.top = Math.random() * maxY + 'px';
             }
         }
 
@@ -186,6 +208,7 @@
             detenerTodosLosAudios();
             audios.amor.play();
             mostrarPantalla('aceptacionContainer');
+            cambiarLluvia('❤️'); // Aseguramos corazones felices
         }
 
         function volverAPregunta() {
@@ -196,30 +219,35 @@
             document.getElementById('btnNo').style.left = '0';
             document.getElementById('btnNo').style.top = '0';
             mostrarPantalla('preguntaContainer');
+            
+            // VOLVER A CORAZONES FELICES
+            cambiarLluvia('❤️');
         }
 
         function mostrarPantalla(id) {
-            const pantallas = ['preguntaContainer', 'gifContainer', 'aceptacionContainer', 'nosotrosContainer'];
-            pantallas.forEach(p => document.getElementById(p).classList.add('hidden'));
+            ['preguntaContainer', 'gifContainer', 'aceptacionContainer', 'nosotrosContainer'].forEach(p => {
+                document.getElementById(p).classList.add('hidden');
+            });
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
         }
 
-        // CAMBIOS PARA LA MÚSICA DOS
         function irANosotros() {
-            detenerTodosLosAudios(); // Pausa amor.mp3
-            audios.dos.play();       // Inicia dos.mp3
+            detenerTodosLosAudios();
+            audios.dos.play();
             mostrarPantalla('nosotrosContainer');
             prepararCarrusel();
+            // Mantiene corazones felices
         }
 
         function irABonos() {
             clearInterval(autoplayInterval);
-            detenerTodosLosAudios(); // Pausa dos.mp3
-            audios.amor.play();      // Regresa a amor.mp3
+            detenerTodosLosAudios();
+            audios.amor.play();
             mostrarPantalla('aceptacionContainer');
         }
 
+        // --- CARRUSEL ---
         function prepararCarrusel() {
             const carrusel = document.getElementById('carrusel');
             if (carrusel.children.length === 0) {
