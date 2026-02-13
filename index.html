@@ -19,12 +19,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-y: auto;
+            overflow-y: auto; /* Permite scroll para ver los bonos */
             padding: 20px;
             position: relative;
         }
 
-        /* Contenedor para la lluvia de corazones de fondo */
+        /* Capa para la lluvia de corazones de fondo */
         #lluviaFondo {
             position: fixed;
             top: 0;
@@ -32,7 +32,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: -1;
+            z-index: 1;
         }
 
         .pregunta-container {
@@ -99,16 +99,16 @@
             text-align: left;
         }
 
-        .corazon {
+        .corazon-fondo {
             position: absolute;
             font-size: 2em;
             animation: caer 4s linear infinite;
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         @keyframes caer {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.7; }
+            10% { opacity: 0.6; }
             100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
         }
 
@@ -116,7 +116,7 @@
         .visible { display: block !important; }
     </style>
 </head>
-<body onclick="iniciarMusicaInicial()">
+<body onclick="iniciarMusicaUno()">
 
     <div id="lluviaFondo"></div>
 
@@ -127,7 +127,7 @@
             <button class="btn-si" onclick="aceptar()">SÍ 💖</button>
             <button class="btn-no" id="btnNo" onclick="rechazar()">NO</button>
         </div>
-        <p style="margin-top: 15px; font-size: 0.8em; color: #888;">(Toca cualquier parte para música)</p>
+        <p style="margin-top: 15px; font-size: 0.8em; color: #888;">(Toca la pantalla para iniciar música)</p>
     </div>
 
     <div class="gif-container" id="gifContainer">
@@ -156,33 +156,39 @@
 
     <script>
         let contadorRechazos = 0;
-        let musicaIniciada = false;
+        let musicaUnoIniciada = false;
+        
+        const audioUno = document.getElementById('musicaUno');
+        const audioTriste = document.getElementById('musicaTriste');
+        const audioAmor = document.getElementById('musicaAmor');
         const btnNo = document.getElementById('btnNo');
-        const musicaUno = document.getElementById('musicaUno');
-        const musicaTriste = document.getElementById('musicaTriste');
-        const musicaAmor = document.getElementById('musicaAmor');
 
-        // Lluvia de corazones constante en el fondo
-        function lluviaConstante() {
+        // Función para lluvia de corazones constante
+        function crearLluvia() {
             const fondo = document.getElementById('lluviaFondo');
             setInterval(() => {
-                const corazon = document.createElement('div');
-                corazon.className = 'corazon';
-                corazon.textContent = '❤️';
-                corazon.style.left = Math.random() * 100 + 'vw';
-                corazon.style.fontSize = (Math.random() * 20 + 10) + 'px';
-                corazon.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                fondo.appendChild(corazon);
-                setTimeout(() => corazon.remove(), 4000);
+                const c = document.createElement('div');
+                c.className = 'corazon-fondo';
+                c.textContent = '❤️';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                fondo.appendChild(c);
+                setTimeout(() => c.remove(), 4000);
             }, 400);
         }
-        lluviaConstante();
+        crearLluvia();
 
-        function iniciarMusicaInicial() {
-            if (!musicaIniciada) {
-                musicaUno.play().catch(e => console.log("Esperando interacción"));
-                musicaIniciada = true;
+        // Inicia uno.mp3 al primer clic en cualquier lado
+        function iniciarMusicaUno() {
+            if (!musicaUnoIniciada) {
+                audioUno.play().catch(e => console.log("Audio esperando interacción"));
+                musicaUnoIniciada = true;
             }
+        }
+
+        function detenerAudioUno() {
+            audioUno.pause();
+            audioUno.currentTime = 0;
         }
 
         function moverBotonNo() {
@@ -198,10 +204,10 @@
         function rechazar() {
             contadorRechazos++;
             if (contadorRechazos >= 5) {
-                musicaUno.pause(); // Detiene canción inicial
+                detenerAudioUno(); // DETENER UNO.MP3
                 document.getElementById('preguntaContainer').classList.add('hidden');
                 document.getElementById('gifContainer').classList.add('visible');
-                musicaTriste.play();
+                audioTriste.play(); // EMPEZAR ESTO-ES-UN-RATITO.MP3
             } else {
                 moverBotonNo();
             }
@@ -209,9 +215,10 @@
 
         function volverAPregunta() {
             contadorRechazos = 0;
-            musicaTriste.pause();
-            musicaTriste.currentTime = 0;
-            musicaUno.play(); // Reinicia la canción inicial
+            audioTriste.pause();
+            audioTriste.currentTime = 0;
+            audioUno.play(); // REGRESA UNO.MP3
+            
             document.getElementById('gifContainer').classList.remove('visible');
             document.getElementById('preguntaContainer').classList.remove('hidden');
             btnNo.style.position = 'relative';
@@ -219,9 +226,10 @@
         }
 
         function aceptar() {
-            musicaUno.pause(); // Detiene canción inicial
-            musicaTriste.pause();
-            musicaAmor.play(); // Reproduce amor.mp3
+            detenerAudioUno(); // DETENER UNO.MP3
+            audioTriste.pause();
+            audioAmor.play(); // EMPEZAR AMOR.MP3
+            
             document.getElementById('preguntaContainer').classList.add('hidden');
             document.getElementById('aceptacionContainer').classList.add('visible');
         }
