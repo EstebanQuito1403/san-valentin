@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quieres ser mi San Valentín? 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Página de pregunta */
+        .pregunta-container {
+            text-align: center;
+            background: white;
+            padding: 50px 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            position: relative;
+        }
+
+        h1 {
+            color: #ff1744;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .emoji {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: latido 1.5s ease-in-out infinite;
+        }
+
+        @keyframes latido {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .botones {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-si {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-si:hover {
+            background: #45a049;
+            transform: scale(1.1);
+        }
+
+        .btn-no {
+            background: #f44336;
+            color: white;
+            position: relative;
+        }
+
+        .btn-no:hover {
+            background: #da190b;
+        }
+
+        /* Página de GIF */
+        .gif-container {
+            display: none;
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+        }
+
+        .gif-container h2 {
+            color: #ff1744;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .gif-container img {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .gif-container button {
+            background: #ff6b9d;
+            color: white;
+            padding: 15px 30px;
+        }
+
+        /* Página de aceptación */
+        .aceptacion-container {
+            display: none;
+            text-align: center;
+            background: white;
+            padding: 50px 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+        }
+
+        .mensaje-amor {
+            color: #ff1744;
+            font-size: 3em;
+            margin-bottom: 30px;
+            animation: brillo 1s ease-in-out infinite;
+            font-weight: bold;
+        }
+
+        @keyframes brillo {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 23, 68, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(255, 23, 68, 0.8); }
+        }
+
+        .tickets-titulo {
+            color: #c06c84;
+            font-size: 2em;
+            margin: 30px 0 20px 0;
+            font-weight: bold;
+        }
+
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .ticket {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticket::before {
+            content: '🎟️';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2em;
+            opacity: 0.3;
+        }
+
+        .ticket:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .ticket-nombre {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .ticket-valido {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .corazones {
+            position: fixed;
+            pointer-events: none;
+        }
+
+        @keyframes caer {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .corazon {
+            position: absolute;
+            font-size: 2em;
+            animation: caer 3s linear infinite;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .visible {
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de pregunta -->
+    <div class="pregunta-container" id="preguntaContainer">
+        <div class="emoji">💕</div>
+        <h1>¿Quieres ser mi San Valentín?</h1>
+        <div class="botones">
+            <button class="btn-si" onclick="aceptar()">SÍ 💖</button>
+            <button class="btn-no" id="btnNo" onclick="rechazar()">NO</button>
+        </div>
+    </div>
+
+    <!-- Pantalla de GIF -->
+    <div class="gif-container" id="gifContainer">
+    <h2>¡Ay nooo! 🥺</h2>
+
+    <img src="https://www.pinterest.com/pin/802063014893042358/" alt="Pepe Saf" style="max-width:90%; height:auto; margin-bottom:20px;">
+
+    <p style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
+        ¡Inténtalo de nuevo! 💔
+    </p>
+    <button onclick="volverAPregunta()">Volver a intentar</button>
+</div>
+
+    <!-- Pantalla de aceptación -->
+    <div class="aceptacion-container" id="aceptacionContainer">
+        <div class="emoji">❤️</div>
+        <div class="mensaje-amor">
+            ¡TE AMO MUCHOOOOOOOOOOOOOOOOOOOOO!
+        </div>
+        <div class="emoji">💋</div>
+        
+        <div class="tickets-titulo">🎁 Tus Bonos de San Valentín 🎁</div>
+        
+        <div class="tickets-grid">
+            <div class="ticket">
+                <div class="ticket-nombre">👣 Masaje de piecitos gratis</div>
+                <div class="ticket-valido">Válido cuando quieras ✨</div>
+            </div>
+            
+            <div class="ticket">
+                <div class="ticket-nombre">💋 Mekatito</div>
+                <div class="ticket-valido">Válido cuando quieras ✨</div>
+            </div>
+            
+            <div class="ticket">
+                <div class="ticket-nombre">💆‍♀️ Masajito de cuerpo completo</div>
+                <div class="ticket-valido">Válido cuando quieras ✨</div>
+            </div>
+            
+            <div class="ticket">
+                <div class="ticket-nombre">💄 Gloss</div>
+                <div class="ticket-valido">Válido cuando quieras ✨</div>
+            </div>
+            
+            <div class="ticket">
+                <div class="ticket-nombre">👶 Nuevo bebe</div>
+                <div class="ticket-valido">Válido cuando quieras ✨</div>
+            </div>
+            
+            <div class="ticket">
+                <div class="ticket-nombre">💫 Acomodada de matriz</div>
+                <div class="ticket-valido">Válido cuando quieras ✨</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let contadorRechazos = 0;
+        const btnNo = document.getElementById('btnNo');
+        
+        function moverBotonNo() {
+            const container = document.querySelector('.pregunta-container');
+            const containerRect = container.getBoundingClientRect();
+            
+            const maxX = containerRect.width - btnNo.offsetWidth - 80;
+            const maxY = containerRect.height - btnNo.offsetHeight - 80;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            
+            btnNo.style.position = 'absolute';
+            btnNo.style.left = randomX + 'px';
+            btnNo.style.top = randomY + 'px';
+        }
+
+        function rechazar() {
+            contadorRechazos++;
+            
+            if (contadorRechazos >= 5) {
+                // Mostrar GIF después de 5 rechazos
+                document.getElementById('preguntaContainer').classList.add('hidden');
+                document.getElementById('gifContainer').classList.remove('hidden');
+                document.getElementById('gifContainer').classList.add('visible');
+            } else {
+                // Mover el botón
+                moverBotonNo();
+            }
+        }
+
+        function volverAPregunta() {
+            // Reiniciar contador
+            contadorRechazos = 0;
+            
+            // Resetear posición del botón NO
+            btnNo.style.position = 'relative';
+            btnNo.style.left = '0';
+            btnNo.style.top = '0';
+            
+            // Volver a la pantalla de pregunta
+            document.getElementById('gifContainer').classList.add('hidden');
+            document.getElementById('gifContainer').classList.remove('visible');
+            document.getElementById('preguntaContainer').classList.remove('hidden');
+        }
+
+        function aceptar() {
+            // Ocultar pregunta y mostrar aceptación
+            document.getElementById('preguntaContainer').classList.add('hidden');
+            document.getElementById('aceptacionContainer').classList.remove('hidden');
+            document.getElementById('aceptacionContainer').classList.add('visible');
+            
+            // Crear corazones cayendo
+            crearCorazones();
+        }
+
+        function crearCorazones() {
+            const corazones = ['❤️', '💕', '💖', '💗', '💓', '💝'];
+            
+            setInterval(() => {
+                const corazon = document.createElement('div');
+                corazon.className = 'corazon';
+                corazon.textContent = corazones[Math.floor(Math.random() * corazones.length)];
+                corazon.style.left = Math.random() * 100 + 'vw';
+                corazon.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(corazon);
+                
+                setTimeout(() => {
+                    corazon.remove();
+                }, 5000);
+            }, 300);
+        }
+    </script>
+</body>
+</html>
