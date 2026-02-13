@@ -21,14 +21,11 @@
             position: relative;
         }
 
-        /* Capa de fondo para la lluvia */
         #lluviaFondo {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 1;
-            overflow: hidden; /* Asegura que no se salga nada */
         }
 
-        /* Contenedores de las pantallas */
         .container-base {
             text-align: center; background: rgba(255, 255, 255, 0.95);
             padding: 40px 20px; border-radius: 30px;
@@ -51,7 +48,8 @@
         }
         .btn-si { background: #4CAF50; color: white; }
         .btn-no { background: #f44336; color: white; position: relative; }
-        .btn-nosotros { background: #ff6b9d; color: white; margin-top: 30px; width: 100%; }
+        .btn-nosotros { background: #ff6b9d; color: white; margin-top: 20px; width: 100%; }
+        .btn-secreto { background: #ffd700; color: #555; margin-top: 10px; width: 100%; }
 
         /* --- TICKETS --- */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -62,44 +60,25 @@
             position: relative; width: 100%; overflow: hidden;
             border-radius: 20px; background: #000; margin: 20px 0;
         }
-
         .carrusel-container {
             display: flex; overflow-x: auto; scroll-behavior: smooth;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
         }
         .carrusel-container::-webkit-scrollbar { display: none; }
-
-        .carrusel-slide {
-            flex: 0 0 100%; scroll-snap-align: center;
-            display: flex; justify-content: center; align-items: center;
-            height: 400px;
-        }
+        .carrusel-slide { flex: 0 0 100%; scroll-snap-align: center; display: flex; justify-content: center; align-items: center; height: 400px; }
         .carrusel-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* --- ANIMACIÓN DE CAIDA CORREGIDA --- */
-        .elemento-caida {
-            position: absolute;
-            top: -50px; /* Empieza fuera de la pantalla */
-            font-size: 2em;
-            animation-name: caer;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
-            opacity: 0.8; /* Hacemos que sean visibles por defecto */
-        }
+        /* --- LLUVIA --- */
+        .elemento-caida { position: absolute; top: -50px; font-size: 2em; animation-name: caer; animation-timing-function: linear; animation-iteration-count: infinite; opacity: 0.8; }
+        @keyframes caer { 0% { transform: translateY(0); opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(110vh); opacity: 0; } }
 
-        @keyframes caer {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            80% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(110vh); /* Cae hasta el final de la pantalla */
-                opacity: 0; /* Se desvanece al final */
-            }
+        /* --- MODAL VIDEO --- */
+        #modalSecreto {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; flex-direction: column;
         }
+        #modalSecreto video { max-width: 90%; max-height: 70%; border-radius: 15px; border: 3px solid #ffd700; }
+        .btn-cerrar { background: #ff1744; color: white; margin-top: 20px; }
 
         .hidden { display: none !important; }
     </style>
@@ -140,11 +119,16 @@
     <div class="container-base hidden" id="nosotrosContainer">
         <h2>Nuestros Momentos ✨</h2>
         <div class="carrusel-wrapper">
-            <div class="carrusel-container" id="carrusel">
-                </div>
+            <div class="carrusel-container" id="carrusel"></div>
         </div>
         <p id="contador" style="font-weight: bold; color: #ff1744;">Foto 1 / 16</p>
+        <button class="btn-secreto" onclick="abrirSecreto()">BOTÓN SECRETO 🤐</button>
         <button class="btn-no" onclick="irABonos()" style="margin-top: 20px;">← Volver a Bonos</button>
+    </div>
+
+    <div id="modalSecreto">
+        <video id="videoRana" controls><source src="rana.mp4" type="video/mp4"></video>
+        <button class="btn-cerrar" onclick="cerrarSecreto()">CERRAR SECRETO ❌</button>
     </div>
 
     <audio id="musicaUno" loop><source src="uno.mp3" type="audio/mpeg"></audio>
@@ -156,7 +140,7 @@
         let contadorRechazos = 0;
         let musicaUnoIniciada = false;
         let autoplayInterval;
-        let emojiActual = '❤️'; // Emoji por defecto
+        let emojiActual = '❤️';
 
         const audios = {
             uno: document.getElementById('musicaUno'),
@@ -165,65 +149,47 @@
             dos: document.getElementById('musicaDos')
         };
 
-        // --- LÓGICA DE LA LLUVIA CORREGIDA ---
         function crearLluvia() {
             const fondo = document.getElementById('lluviaFondo');
             setInterval(() => {
                 const c = document.createElement('div');
                 c.className = 'elemento-caida';
                 c.textContent = emojiActual;
-                c.style.left = Math.random() * 95 + '%'; // Usamos % para evitar scroll horizontal
-                c.style.animationDuration = (Math.random() * 3 + 2) + 's'; // Duración entre 2s y 5s
+                c.style.left = Math.random() * 95 + '%';
+                c.style.animationDuration = (Math.random() * 3 + 2) + 's';
                 c.style.fontSize = (Math.random() * 20 + 20) + 'px';
                 fondo.appendChild(c);
-                
-                // Elimina el elemento después de caer (5s es suficiente)
                 setTimeout(() => c.remove(), 5000);
-            }, 200); // Crea un nuevo emoji cada 200ms
+            }, 200);
         }
         crearLluvia();
 
         function cambiarLluvia(tipo) {
-            const fondo = document.getElementById('lluviaFondo');
-            fondo.innerHTML = ''; // Limpia los emojis anteriores
+            document.getElementById('lluviaFondo').innerHTML = '';
             emojiActual = tipo;
         }
 
-        // --- MÚSICA Y NAVEGACIÓN ---
         function iniciarMusicaUno() {
-            if (!musicaUnoIniciada) {
-                audios.uno.play().catch(() => {});
-                musicaUnoIniciada = true;
-            }
+            if (!musicaUnoIniciada) { audios.uno.play().catch(() => {}); musicaUnoIniciada = true; }
         }
 
         function detenerTodosLosAudios() {
-            Object.values(audios).forEach(audio => {
-                audio.pause();
-                audio.currentTime = 0;
-            });
+            Object.values(audios).forEach(a => { a.pause(); a.currentTime = 0; });
         }
 
         function rechazar() {
             contadorRechazos++;
             if (contadorRechazos >= 5) {
                 detenerTodosLosAudios();
-                document.getElementById('preguntaContainer').classList.add('hidden');
-                document.getElementById('gifContainer').classList.remove('hidden');
+                mostrarPantalla('gifContainer');
                 audios.triste.play();
-                
-                // CAMBIO A CORAZONES ROTOS
                 cambiarLluvia('💔');
             } else {
                 const btn = document.getElementById('btnNo');
                 const container = document.getElementById('preguntaContainer').getBoundingClientRect();
-                // Aseguramos que el botón se mantenga dentro del contenedor
-                const maxX = container.width - btn.offsetWidth - 20;
-                const maxY = container.height - btn.offsetHeight - 20;
-                
                 btn.style.position = 'absolute';
-                btn.style.left = Math.random() * maxX + 'px';
-                btn.style.top = Math.random() * maxY + 'px';
+                btn.style.left = Math.random() * (container.width - 100) + 'px';
+                btn.style.top = Math.random() * (container.height - 50) + 'px';
             }
         }
 
@@ -231,7 +197,7 @@
             detenerTodosLosAudios();
             audios.amor.play();
             mostrarPantalla('aceptacionContainer');
-            cambiarLluvia('❤️'); // Aseguramos corazones felices
+            cambiarLluvia('❤️');
         }
 
         function volverAPregunta() {
@@ -242,17 +208,12 @@
             document.getElementById('btnNo').style.left = 'auto';
             document.getElementById('btnNo').style.top = 'auto';
             mostrarPantalla('preguntaContainer');
-            
-            // VOLVER A CORAZONES FELICES
             cambiarLluvia('❤️');
         }
 
         function mostrarPantalla(id) {
-            ['preguntaContainer', 'gifContainer', 'aceptacionContainer', 'nosotrosContainer'].forEach(p => {
-                document.getElementById(p).classList.add('hidden');
-            });
+            ['preguntaContainer', 'gifContainer', 'aceptacionContainer', 'nosotrosContainer'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            window.scrollTo(0,0);
         }
 
         function irANosotros() {
@@ -260,7 +221,6 @@
             audios.dos.play();
             mostrarPantalla('nosotrosContainer');
             prepararCarrusel();
-            // Mantiene corazones felices
         }
 
         function irABonos() {
@@ -270,7 +230,23 @@
             mostrarPantalla('aceptacionContainer');
         }
 
-        // --- CARRUSEL ---
+        function abrirSecreto() {
+            const modal = document.getElementById('modalSecreto');
+            const video = document.getElementById('videoRana');
+            audios.dos.pause();
+            modal.style.display = 'flex';
+            video.play();
+        }
+
+        function cerrarSecreto() {
+            const modal = document.getElementById('modalSecreto');
+            const video = document.getElementById('videoRana');
+            video.pause();
+            video.currentTime = 0;
+            modal.style.display = 'none';
+            audios.dos.play();
+        }
+
         function prepararCarrusel() {
             const carrusel = document.getElementById('carrusel');
             if (carrusel.children.length === 0) {
@@ -281,21 +257,14 @@
                     carrusel.appendChild(slide);
                 }
             }
-            
             clearInterval(autoplayInterval);
             autoplayInterval = setInterval(() => {
-                const scrollLeft = carrusel.scrollLeft;
                 const width = carrusel.offsetWidth;
-                if (scrollLeft + width >= carrusel.scrollWidth - width / 2) {
-                    carrusel.scrollTo({ left: 0, behavior: 'smooth' });
-                } else {
-                    carrusel.scrollBy({ left: width, behavior: 'smooth' });
-                }
+                if (carrusel.scrollLeft + width >= carrusel.scrollWidth - 10) carrusel.scrollTo({ left: 0, behavior: 'smooth' });
+                else carrusel.scrollBy({ left: width, behavior: 'smooth' });
             }, 3000);
-
             carrusel.addEventListener('scroll', () => {
-                const index = Math.round(carrusel.scrollLeft / carrusel.offsetWidth) + 1;
-                document.getElementById('contador').textContent = `Foto ${index} / 16`;
+                document.getElementById('contador').textContent = `Foto ${Math.round(carrusel.scrollLeft / carrusel.offsetWidth) + 1} / 16`;
             });
         }
     </script>
