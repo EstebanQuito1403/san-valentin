@@ -19,12 +19,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-y: auto; /* Permite scroll para ver los bonos */
+            overflow-y: auto;
             padding: 20px;
             position: relative;
         }
 
-        /* Capa para la lluvia de corazones de fondo */
+        /* Lluvia de corazones de fondo */
         #lluviaFondo {
             position: fixed;
             top: 0;
@@ -81,7 +81,11 @@
             z-index: 10;
         }
 
-        .aceptacion-container { max-width: 700px; width: 100%; margin: 20px 0; }
+        .aceptacion-container { 
+            max-width: 700px; 
+            width: 100%; 
+            margin: 40px 0; 
+        }
         .mensaje-amor { color: #ff1744; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
 
         .tickets-grid {
@@ -98,6 +102,49 @@
             border-radius: 15px;
             text-align: left;
         }
+
+        /* --- CARRUSEL --- */
+        .carrusel-seccion {
+            margin-top: 40px;
+            border-top: 2px dashed #ff6b9d;
+            padding-top: 30px;
+        }
+
+        .carrusel-marco {
+            position: relative;
+            max-width: 100%;
+            height: 450px;
+            margin: 20px auto 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #fotoCarrusel {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 107, 157, 0.8);
+            color: white;
+            border: none;
+            font-size: 2em;
+            padding: 10px 15px;
+            cursor: pointer;
+            z-index: 2;
+            border-radius: 10px;
+        }
+        .prev { left: 10px; }
+        .next { right: 10px; }
 
         .corazon-fondo {
             position: absolute;
@@ -127,12 +174,12 @@
             <button class="btn-si" onclick="aceptar()">SÍ 💖</button>
             <button class="btn-no" id="btnNo" onclick="rechazar()">NO</button>
         </div>
-        <p style="margin-top: 15px; font-size: 0.8em; color: #888;">(Toca la pantalla para iniciar música)</p>
+        <p style="margin-top: 15px; font-size: 0.8em; color: #888;">(Toca la pantalla para la música)</p>
     </div>
 
     <div class="gif-container" id="gifContainer">
         <h2>¡Ay nooo! 🥺</h2>
-        <img src="https://media1.tenor.com/m/fTTVgygGDh8AAAAC/sad-pepe-cry.gif" alt="Pepe Saf" style="max-width:90%; height:auto; margin-bottom:20px;">
+        <img src="https://media1.tenor.com/m/fTTVgygGDh8AAAAC/sad-pepe-cry.gif" alt="Pepe Llorando" style="max-width:90%; height:auto; margin-bottom:20px;">
         <p>¡Inténtalo de nuevo! 💔</p>
         <button onclick="volverAPregunta()">Volver a intentar</button>
     </div>
@@ -140,6 +187,7 @@
     <div class="aceptacion-container" id="aceptacionContainer">
         <div class="emoji">❤️</div>
         <div class="mensaje-amor">¡TE AMO MUCHOOOOO!</div>
+        
         <div class="tickets-grid">
             <div class="ticket"><b>👣 Masaje de piecitos gratis</b><br>Válido cuando quieras ✨</div>
             <div class="ticket"><b>💋 Mekatito</b><br>Válido cuando quieras ✨</div>
@@ -147,6 +195,20 @@
             <div class="ticket"><b>💄 Gloss</b><br>Válido cuando quieras ✨</div>
             <div class="ticket"><b>👶 Nuevo bebe</b><br>Válido cuando quieras ✨</div>
             <div class="ticket"><b>💫 Acomodada de matriz</b><br>Válido cuando quieras ✨</div>
+        </div>
+
+        <div class="carrusel-seccion">
+            <button id="btnNosotros" class="btn-si" onclick="mostrarCarrusel()">Nosotros ❤️</button>
+            
+            <div id="carruselContainer" class="hidden">
+                <h2 style="color: #ff1744; margin-top: 20px;">Nuestros Momentos ✨</h2>
+                <div class="carrusel-marco">
+                    <button class="nav-btn prev" onclick="cambiarFoto(-1)">&#10094;</button>
+                    <img id="fotoCarrusel" src="" alt="Foto">
+                    <button class="nav-btn next" onclick="cambiarFoto(1)">&#10095;</button>
+                </div>
+                <p id="contadorFotos" style="color: #666; margin-top: 10px; font-weight: bold;">1 / 16</p>
+            </div>
         </div>
     </div>
 
@@ -158,12 +220,16 @@
         let contadorRechazos = 0;
         let musicaUnoIniciada = false;
         
+        // Configuración Carrusel
+        let fotoActual = 1;
+        const totalFotos = 16; // CAMBIADO A 16 FOTOS
+        const formatoFotos = '.jpg';
+        
         const audioUno = document.getElementById('musicaUno');
         const audioTriste = document.getElementById('musicaTriste');
         const audioAmor = document.getElementById('musicaAmor');
         const btnNo = document.getElementById('btnNo');
 
-        // Función para lluvia de corazones constante
         function crearLluvia() {
             const fondo = document.getElementById('lluviaFondo');
             setInterval(() => {
@@ -178,18 +244,13 @@
         }
         crearLluvia();
 
-        // Inicia uno.mp3 al primer clic en cualquier lado
         function iniciarMusicaUno() {
             if (!musicaUnoIniciada) {
                 audioUno.play().catch(e => console.log("Audio esperando interacción"));
                 musicaUnoIniciada = true;
             }
         }
-
-        function detenerAudioUno() {
-            audioUno.pause();
-            audioUno.currentTime = 0;
-        }
+        function detenerAudioUno() { audioUno.pause(); audioUno.currentTime = 0; }
 
         function moverBotonNo() {
             const container = document.querySelector('.pregunta-container');
@@ -204,34 +265,49 @@
         function rechazar() {
             contadorRechazos++;
             if (contadorRechazos >= 5) {
-                detenerAudioUno(); // DETENER UNO.MP3
+                detenerAudioUno();
                 document.getElementById('preguntaContainer').classList.add('hidden');
                 document.getElementById('gifContainer').classList.add('visible');
-                audioTriste.play(); // EMPEZAR ESTO-ES-UN-RATITO.MP3
-            } else {
-                moverBotonNo();
-            }
+                audioTriste.play();
+            } else { moverBotonNo(); }
         }
 
         function volverAPregunta() {
             contadorRechazos = 0;
-            audioTriste.pause();
-            audioTriste.currentTime = 0;
-            audioUno.play(); // REGRESA UNO.MP3
-            
+            audioTriste.pause(); audioTriste.currentTime = 0;
+            audioUno.play();
             document.getElementById('gifContainer').classList.remove('visible');
             document.getElementById('preguntaContainer').classList.remove('hidden');
-            btnNo.style.position = 'relative';
-            btnNo.style.left = '0'; btnNo.style.top = '0';
+            btnNo.style.position = 'relative'; btnNo.style.left = '0'; btnNo.style.top = '0';
         }
 
         function aceptar() {
-            detenerAudioUno(); // DETENER UNO.MP3
+            detenerAudioUno();
             audioTriste.pause();
-            audioAmor.play(); // EMPEZAR AMOR.MP3
-            
+            audioAmor.play();
             document.getElementById('preguntaContainer').classList.add('hidden');
             document.getElementById('aceptacionContainer').classList.add('visible');
+            window.scrollTo(0, 0);
+        }
+
+        function mostrarCarrusel() {
+            document.getElementById('btnNosotros').style.display = 'none';
+            document.getElementById('carruselContainer').classList.remove('hidden');
+            actualizarFoto();
+        }
+
+        function cambiarFoto(direccion) {
+            fotoActual += direccion;
+            if (fotoActual > totalFotos) fotoActual = 1;
+            if (fotoActual < 1) fotoActual = totalFotos;
+            actualizarFoto();
+        }
+
+        function actualizarFoto() {
+            const img = document.getElementById('fotoCarrusel');
+            const contador = document.getElementById('contadorFotos');
+            img.src = fotoActual + formatoFotos;
+            contador.textContent = `${fotoActual} / ${totalFotos}`;
         }
     </script>
 </body>
