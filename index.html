@@ -25,6 +25,7 @@
         #lluviaFondo {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 1;
+            overflow: hidden; /* Asegura que no se salga nada */
         }
 
         /* Contenedores de las pantallas */
@@ -75,9 +76,30 @@
         }
         .carrusel-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* --- ANIMACIÓN DE CAIDA --- */
-        .elemento-caida { position: absolute; font-size: 2em; animation: caer 4s linear infinite; opacity: 0.6; }
-        @keyframes caer { 0% { transform: translateY(-10vh); opacity: 0; } 100% { transform: translateY(110vh); opacity: 0; } }
+        /* --- ANIMACIÓN DE CAIDA CORREGIDA --- */
+        .elemento-caida {
+            position: absolute;
+            top: -50px; /* Empieza fuera de la pantalla */
+            font-size: 2em;
+            animation-name: caer;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            opacity: 0.8; /* Hacemos que sean visibles por defecto */
+        }
+
+        @keyframes caer {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh); /* Cae hasta el final de la pantalla */
+                opacity: 0; /* Se desvanece al final */
+            }
+        }
 
         .hidden { display: none !important; }
     </style>
@@ -143,27 +165,27 @@
             dos: document.getElementById('musicaDos')
         };
 
-        // --- LÓGICA DE LA LLUVIA ---
+        // --- LÓGICA DE LA LLUVIA CORREGIDA ---
         function crearLluvia() {
             const fondo = document.getElementById('lluviaFondo');
             setInterval(() => {
                 const c = document.createElement('div');
                 c.className = 'elemento-caida';
-                c.textContent = emojiActual; // Usa el emoji configurado actualmente
-                c.style.left = Math.random() * 100 + 'vw';
-                c.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                c.style.fontSize = (Math.random() * 20 + 20) + 'px'; // Tamaño variable
+                c.textContent = emojiActual;
+                c.style.left = Math.random() * 95 + '%'; // Usamos % para evitar scroll horizontal
+                c.style.animationDuration = (Math.random() * 3 + 2) + 's'; // Duración entre 2s y 5s
+                c.style.fontSize = (Math.random() * 20 + 20) + 'px';
                 fondo.appendChild(c);
                 
-                // Elimina el elemento después de caer
-                setTimeout(() => c.remove(), 4000);
-            }, 300);
+                // Elimina el elemento después de caer (5s es suficiente)
+                setTimeout(() => c.remove(), 5000);
+            }, 200); // Crea un nuevo emoji cada 200ms
         }
         crearLluvia();
 
         function cambiarLluvia(tipo) {
             const fondo = document.getElementById('lluviaFondo');
-            fondo.innerHTML = ''; // Limpia los emojis anteriores instantáneamente
+            fondo.innerHTML = ''; // Limpia los emojis anteriores
             emojiActual = tipo;
         }
 
@@ -195,8 +217,9 @@
             } else {
                 const btn = document.getElementById('btnNo');
                 const container = document.getElementById('preguntaContainer').getBoundingClientRect();
-                const maxX = container.width - 100;
-                const maxY = container.height - 50;
+                // Aseguramos que el botón se mantenga dentro del contenedor
+                const maxX = container.width - btn.offsetWidth - 20;
+                const maxY = container.height - btn.offsetHeight - 20;
                 
                 btn.style.position = 'absolute';
                 btn.style.left = Math.random() * maxX + 'px';
@@ -216,8 +239,8 @@
             detenerTodosLosAudios();
             audios.uno.play();
             document.getElementById('btnNo').style.position = 'relative';
-            document.getElementById('btnNo').style.left = '0';
-            document.getElementById('btnNo').style.top = '0';
+            document.getElementById('btnNo').style.left = 'auto';
+            document.getElementById('btnNo').style.top = 'auto';
             mostrarPantalla('preguntaContainer');
             
             // VOLVER A CORAZONES FELICES
@@ -263,7 +286,7 @@
             autoplayInterval = setInterval(() => {
                 const scrollLeft = carrusel.scrollLeft;
                 const width = carrusel.offsetWidth;
-                if (scrollLeft + width >= carrusel.scrollWidth) {
+                if (scrollLeft + width >= carrusel.scrollWidth - width / 2) {
                     carrusel.scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
                     carrusel.scrollBy({ left: width, behavior: 'smooth' });
