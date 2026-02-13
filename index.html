@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¿Quieres ser mi San Valentín? 💕</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* Estilos base del proyecto anterior */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Arial', sans-serif;
@@ -19,197 +16,115 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow-x: hidden;
             overflow-y: auto;
-            padding: 20px;
             position: relative;
         }
 
-        /* Lluvia de corazones de fondo */
         #lluviaFondo {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
         }
 
-        .pregunta-container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 50px 40px;
-            border-radius: 30px;
+        .container-base {
+            text-align: center; background: rgba(255, 255, 255, 0.95);
+            padding: 40px 20px; border-radius: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            position: relative;
-            z-index: 10;
+            width: 90%; max-width: 600px; z-index: 10; margin: 20px;
         }
 
-        h1 { color: #ff1744; font-size: 2.5em; margin-bottom: 30px; }
-        .emoji { font-size: 5em; margin-bottom: 20px; animation: latido 1.5s infinite; }
+        h1, h2 { color: #ff1744; margin-bottom: 20px; }
+        .emoji { font-size: 5em; animation: latido 1.5s infinite; }
         
-        @keyframes latido {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
+        @keyframes latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
+        /* Botones mejorados */
         .botones { display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
-        
         button {
-            padding: 15px 40px;
-            font-size: 1.3em;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            padding: 15px 30px; font-size: 1.2em; border: none; border-radius: 15px;
+            cursor: pointer; font-weight: bold; transition: 0.3s;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-
         .btn-si { background: #4CAF50; color: white; }
         .btn-no { background: #f44336; color: white; position: relative; }
+        .btn-nosotros { background: #ff6b9d; color: white; margin-top: 30px; width: 100%; }
 
-        .gif-container, .aceptacion-container {
-            display: none;
-            text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            z-index: 10;
+        /* Tickets de bonos */
+        .tickets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .ticket { background: linear-gradient(135deg, #ff6b9d, #c06c84); color: white; padding: 15px; border-radius: 12px; text-align: left; }
+
+        /* --- NUEVO CARRUSEL ANIMADO --- */
+        .carrusel-wrapper {
+            position: relative; width: 100%; overflow: hidden;
+            border-radius: 20px; background: #000; margin: 20px 0;
         }
 
-        .aceptacion-container { 
-            max-width: 700px; 
-            width: 100%; 
-            margin: 40px 0; 
-        }
-        .mensaje-amor { color: #ff1744; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
-
-        .tickets-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+        .carrusel-container {
+            display: flex; overflow-x: auto; scroll-behavior: smooth;
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
         }
 
-        .ticket {
-            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: left;
+        /* Ocultar barra de scroll */
+        .carrusel-container::-webkit-scrollbar { display: none; }
+
+        .carrusel-slide {
+            flex: 0 0 100%; scroll-snap-align: center;
+            display: flex; justify-content: center; align-items: center;
+            height: 400px;
         }
 
-        /* --- CARRUSEL --- */
-        .carrusel-seccion {
-            margin-top: 40px;
-            border-top: 2px dashed #ff6b9d;
-            padding-top: 30px;
+        .carrusel-slide img {
+            max-width: 100%; max-height: 100%; object-fit: contain;
         }
 
-        .carrusel-marco {
-            position: relative;
-            max-width: 100%;
-            height: 450px;
-            margin: 20px auto 0;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #fotoCarrusel {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .nav-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 107, 157, 0.8);
-            color: white;
-            border: none;
-            font-size: 2em;
-            padding: 10px 15px;
-            cursor: pointer;
-            z-index: 2;
-            border-radius: 10px;
-        }
-        .prev { left: 10px; }
-        .next { right: 10px; }
-
-        .corazon-fondo {
-            position: absolute;
-            font-size: 2em;
-            animation: caer 4s linear infinite;
-            opacity: 0.6;
-        }
-
-        @keyframes caer {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.6; }
-            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-        }
+        /* --- CONTROLADORES --- */
+        .corazon-fondo { position: absolute; font-size: 2em; animation: caer 4s linear infinite; opacity: 0.6; }
+        @keyframes caer { 0% { transform: translateY(-10vh); opacity: 0; } 100% { transform: translateY(110vh); opacity: 0; } }
 
         .hidden { display: none !important; }
-        .visible { display: block !important; }
     </style>
 </head>
 <body onclick="iniciarMusicaUno()">
 
     <div id="lluviaFondo"></div>
 
-    <div class="pregunta-container" id="preguntaContainer">
+    <div class="container-base" id="preguntaContainer">
         <div class="emoji">💕</div>
         <h1>¿Quieres ser mi San Valentín?</h1>
         <div class="botones">
             <button class="btn-si" onclick="aceptar()">SÍ 💖</button>
             <button class="btn-no" id="btnNo" onclick="rechazar()">NO</button>
         </div>
-        <p style="margin-top: 15px; font-size: 0.8em; color: #888;">(Toca la pantalla para la música)</p>
     </div>
 
-    <div class="gif-container" id="gifContainer">
+    <div class="container-base hidden" id="gifContainer">
         <h2>¡Ay nooo! 🥺</h2>
-        <img src="https://media1.tenor.com/m/fTTVgygGDh8AAAAC/sad-pepe-cry.gif" alt="Pepe Llorando" style="max-width:90%; height:auto; margin-bottom:20px;">
-        <p>¡Inténtalo de nuevo! 💔</p>
-        <button onclick="volverAPregunta()">Volver a intentar</button>
+        <img src="https://media1.tenor.com/m/fTTVgygGDh8AAAAC/sad-pepe-cry.gif" alt="Triste" style="width:100%; border-radius:15px;">
+        <button class="btn-nosotros" onclick="volverAPregunta()">Volver a intentar</button>
     </div>
 
-    <div class="aceptacion-container" id="aceptacionContainer">
+    <div class="container-base hidden" id="aceptacionContainer">
         <div class="emoji">❤️</div>
-        <div class="mensaje-amor">¡TE AMO MUCHOOOOO!</div>
-        
+        <h2 style="font-size: 2em;">¡TE AMO MUCHO!</h2>
         <div class="tickets-grid">
-            <div class="ticket"><b>👣 Masaje de piecitos gratis</b><br>Válido cuando quieras ✨</div>
-            <div class="ticket"><b>💋 Mekatito</b><br>Válido cuando quieras ✨</div>
-            <div class="ticket"><b>💆‍♀️ Masajito cuerpo completo</b><br>Válido cuando quieras ✨</div>
-            <div class="ticket"><b>💄 Gloss</b><br>Válido cuando quieras ✨</div>
-            <div class="ticket"><b>👶 Nuevo bebe</b><br>Válido cuando quieras ✨</div>
-            <div class="ticket"><b>💫 Acomodada de matriz</b><br>Válido cuando quieras ✨</div>
+            <div class="ticket"><b>👣 Masaje gratis</b><br>Válido siempre ✨</div>
+            <div class="ticket"><b>💋 Mekatito</b><br>Válido siempre ✨</div>
+            <div class="ticket"><b>💆‍♀️ Masaje cuerpo</b><br>Válido siempre ✨</div>
+            <div class="ticket"><b>💄 Gloss</b><br>Válido siempre ✨</div>
+            <div class="ticket"><b>👶 Nuevo bebe</b><br>Válido siempre ✨</div>
+            <div class="ticket"><b>💫 Acomodada matriz</b><br>Válido siempre ✨</div>
         </div>
+        <button class="btn-nosotros" onclick="irANosotros()">Nosotros ❤️</button>
+    </div>
 
-        <div class="carrusel-seccion">
-            <button id="btnNosotros" class="btn-si" onclick="mostrarCarrusel()">Nosotros ❤️</button>
-            
-            <div id="carruselContainer" class="hidden">
-                <h2 style="color: #ff1744; margin-top: 20px;">Nuestros Momentos ✨</h2>
-                <div class="carrusel-marco">
-                    <button class="nav-btn prev" onclick="cambiarFoto(-1)">&#10094;</button>
-                    <img id="fotoCarrusel" src="" alt="Foto">
-                    <button class="nav-btn next" onclick="cambiarFoto(1)">&#10095;</button>
+    <div class="container-base hidden" id="nosotrosContainer">
+        <h2>Nuestros Momentos ✨</h2>
+        <div class="carrusel-wrapper">
+            <div class="carrusel-container" id="carrusel">
                 </div>
-                <p id="contadorFotos" style="color: #666; margin-top: 10px; font-weight: bold;">1 / 16</p>
-            </div>
         </div>
+        <p id="contador" style="font-weight: bold; color: #ff1744;">Foto 1 / 16</p>
+        <button class="btn-no" onclick="irABonos()" style="margin-top: 20px;">← Volver a Bonos</button>
     </div>
 
     <audio id="musicaUno" loop><source src="uno.mp3" type="audio/mpeg"></audio>
@@ -219,17 +134,15 @@
     <script>
         let contadorRechazos = 0;
         let musicaUnoIniciada = false;
-        
-        // Configuración Carrusel
-        let fotoActual = 1;
-        const totalFotos = 16; // CAMBIADO A 16 FOTOS
-        const formatoFotos = '.jpg';
-        
-        const audioUno = document.getElementById('musicaUno');
-        const audioTriste = document.getElementById('musicaTriste');
-        const audioAmor = document.getElementById('musicaAmor');
-        const btnNo = document.getElementById('btnNo');
+        let autoplayInterval;
 
+        const audios = {
+            uno: document.getElementById('musicaUno'),
+            triste: document.getElementById('musicaTriste'),
+            amor: document.getElementById('musicaAmor')
+        };
+
+        // 1. Generar lluvia de corazones
         function crearLluvia() {
             const fondo = document.getElementById('lluviaFondo');
             setInterval(() => {
@@ -244,70 +157,92 @@
         }
         crearLluvia();
 
+        // 2. Control de música inicial
         function iniciarMusicaUno() {
             if (!musicaUnoIniciada) {
-                audioUno.play().catch(e => console.log("Audio esperando interacción"));
+                audios.uno.play().catch(() => {});
                 musicaUnoIniciada = true;
             }
         }
-        function detenerAudioUno() { audioUno.pause(); audioUno.currentTime = 0; }
 
-        function moverBotonNo() {
-            const container = document.querySelector('.pregunta-container');
-            const containerRect = container.getBoundingClientRect();
-            const maxX = containerRect.width - btnNo.offsetWidth - 20;
-            const maxY = containerRect.height - btnNo.offsetHeight - 20;
-            btnNo.style.position = 'absolute';
-            btnNo.style.left = Math.random() * maxX + 'px';
-            btnNo.style.top = Math.random() * maxY + 'px';
-        }
-
+        // 3. Lógica de botones
         function rechazar() {
             contadorRechazos++;
             if (contadorRechazos >= 5) {
-                detenerAudioUno();
+                audios.uno.pause();
                 document.getElementById('preguntaContainer').classList.add('hidden');
-                document.getElementById('gifContainer').classList.add('visible');
-                audioTriste.play();
-            } else { moverBotonNo(); }
+                document.getElementById('gifContainer').classList.remove('hidden');
+                audios.triste.play();
+            } else {
+                const btn = document.getElementById('btnNo');
+                btn.style.position = 'absolute';
+                btn.style.left = Math.random() * 70 + '%';
+                btn.style.top = Math.random() * 70 + '%';
+            }
+        }
+
+        function aceptar() {
+            audios.uno.pause(); audios.triste.pause();
+            audios.amor.play();
+            mostrarPantalla('aceptacionContainer');
         }
 
         function volverAPregunta() {
             contadorRechazos = 0;
-            audioTriste.pause(); audioTriste.currentTime = 0;
-            audioUno.play();
-            document.getElementById('gifContainer').classList.remove('visible');
-            document.getElementById('preguntaContainer').classList.remove('hidden');
-            btnNo.style.position = 'relative'; btnNo.style.left = '0'; btnNo.style.top = '0';
+            audios.triste.pause(); audios.uno.play();
+            document.getElementById('btnNo').style.position = 'relative';
+            document.getElementById('btnNo').style.left = '0';
+            document.getElementById('btnNo').style.top = '0';
+            mostrarPantalla('preguntaContainer');
         }
 
-        function aceptar() {
-            detenerAudioUno();
-            audioTriste.pause();
-            audioAmor.play();
-            document.getElementById('preguntaContainer').classList.add('hidden');
-            document.getElementById('aceptacionContainer').classList.add('visible');
-            window.scrollTo(0, 0);
+        // 4. Navegación entre páginas
+        function mostrarPantalla(id) {
+            const pantallas = ['preguntaContainer', 'gifContainer', 'aceptacionContainer', 'nosotrosContainer'];
+            pantallas.forEach(p => document.getElementById(p).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            window.scrollTo(0,0);
         }
 
-        function mostrarCarrusel() {
-            document.getElementById('btnNosotros').style.display = 'none';
-            document.getElementById('carruselContainer').classList.remove('hidden');
-            actualizarFoto();
+        function irANosotros() {
+            mostrarPantalla('nosotrosContainer');
+            prepararCarrusel();
         }
 
-        function cambiarFoto(direccion) {
-            fotoActual += direccion;
-            if (fotoActual > totalFotos) fotoActual = 1;
-            if (fotoActual < 1) fotoActual = totalFotos;
-            actualizarFoto();
+        function irABonos() {
+            clearInterval(autoplayInterval);
+            mostrarPantalla('aceptacionContainer');
         }
 
-        function actualizarFoto() {
-            const img = document.getElementById('fotoCarrusel');
-            const contador = document.getElementById('contadorFotos');
-            img.src = fotoActual + formatoFotos;
-            contador.textContent = `${fotoActual} / ${totalFotos}`;
+        // 5. Lógica del Carrusel Animado
+        function prepararCarrusel() {
+            const carrusel = document.getElementById('carrusel');
+            if (carrusel.children.length === 0) {
+                for (let i = 1; i <= 16; i++) {
+                    const slide = document.createElement('div');
+                    slide.className = 'carrusel-slide';
+                    slide.innerHTML = `<img src="${i}.jpg" alt="Foto ${i}">`;
+                    carrusel.appendChild(slide);
+                }
+            }
+            
+            // Iniciar movimiento automático
+            clearInterval(autoplayInterval);
+            autoplayInterval = setInterval(() => {
+                const scrollLeft = carrusel.scrollLeft;
+                const width = carrusel.offsetWidth;
+                if (scrollLeft + width >= carrusel.scrollWidth) {
+                    carrusel.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    carrusel.scrollBy({ left: width, behavior: 'smooth' });
+                }
+            }, 3000);
+
+            // Actualizar contador al mover
+            carrusel.addEventListener('scroll', () => {
+                const index = Math.round(carrusel.scrollLeft / carrusel.offsetWidth) + 1;
+                document.getElementById('contador').textContent = `Foto ${index} / 16`;
+            });
         }
     </script>
 </body>
