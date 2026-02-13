@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¿Quieres ser mi San Valentín? 💕</title>
     <style>
-        /* Estilos base del proyecto anterior */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -38,7 +37,6 @@
         
         @keyframes latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        /* Botones mejorados */
         .botones { display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
         button {
             padding: 15px 30px; font-size: 1.2em; border: none; border-radius: 15px;
@@ -49,11 +47,10 @@
         .btn-no { background: #f44336; color: white; position: relative; }
         .btn-nosotros { background: #ff6b9d; color: white; margin-top: 30px; width: 100%; }
 
-        /* Tickets de bonos */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
         .ticket { background: linear-gradient(135deg, #ff6b9d, #c06c84); color: white; padding: 15px; border-radius: 12px; text-align: left; }
 
-        /* --- NUEVO CARRUSEL ANIMADO --- */
+        /* --- CARRUSEL ANIMADO --- */
         .carrusel-wrapper {
             position: relative; width: 100%; overflow: hidden;
             border-radius: 20px; background: #000; margin: 20px 0;
@@ -64,7 +61,6 @@
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
         }
 
-        /* Ocultar barra de scroll */
         .carrusel-container::-webkit-scrollbar { display: none; }
 
         .carrusel-slide {
@@ -77,7 +73,6 @@
             max-width: 100%; max-height: 100%; object-fit: contain;
         }
 
-        /* --- CONTROLADORES --- */
         .corazon-fondo { position: absolute; font-size: 2em; animation: caer 4s linear infinite; opacity: 0.6; }
         @keyframes caer { 0% { transform: translateY(-10vh); opacity: 0; } 100% { transform: translateY(110vh); opacity: 0; } }
 
@@ -130,6 +125,7 @@
     <audio id="musicaUno" loop><source src="uno.mp3" type="audio/mpeg"></audio>
     <audio id="musicaTriste" loop><source src="esto-es-un-ratito.mp3" type="audio/mpeg"></audio>
     <audio id="musicaAmor" loop><source src="amor.mp3" type="audio/mpeg"></audio>
+    <audio id="musicaDos" loop><source src="dos.mp3" type="audio/mpeg"></audio>
 
     <script>
         let contadorRechazos = 0;
@@ -139,10 +135,10 @@
         const audios = {
             uno: document.getElementById('musicaUno'),
             triste: document.getElementById('musicaTriste'),
-            amor: document.getElementById('musicaAmor')
+            amor: document.getElementById('musicaAmor'),
+            dos: document.getElementById('musicaDos')
         };
 
-        // 1. Generar lluvia de corazones
         function crearLluvia() {
             const fondo = document.getElementById('lluviaFondo');
             setInterval(() => {
@@ -157,7 +153,6 @@
         }
         crearLluvia();
 
-        // 2. Control de música inicial
         function iniciarMusicaUno() {
             if (!musicaUnoIniciada) {
                 audios.uno.play().catch(() => {});
@@ -165,11 +160,17 @@
             }
         }
 
-        // 3. Lógica de botones
+        function detenerTodosLosAudios() {
+            Object.values(audios).forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+        }
+
         function rechazar() {
             contadorRechazos++;
             if (contadorRechazos >= 5) {
-                audios.uno.pause();
+                detenerTodosLosAudios();
                 document.getElementById('preguntaContainer').classList.add('hidden');
                 document.getElementById('gifContainer').classList.remove('hidden');
                 audios.triste.play();
@@ -182,21 +183,21 @@
         }
 
         function aceptar() {
-            audios.uno.pause(); audios.triste.pause();
+            detenerTodosLosAudios();
             audios.amor.play();
             mostrarPantalla('aceptacionContainer');
         }
 
         function volverAPregunta() {
             contadorRechazos = 0;
-            audios.triste.pause(); audios.uno.play();
+            detenerTodosLosAudios();
+            audios.uno.play();
             document.getElementById('btnNo').style.position = 'relative';
             document.getElementById('btnNo').style.left = '0';
             document.getElementById('btnNo').style.top = '0';
             mostrarPantalla('preguntaContainer');
         }
 
-        // 4. Navegación entre páginas
         function mostrarPantalla(id) {
             const pantallas = ['preguntaContainer', 'gifContainer', 'aceptacionContainer', 'nosotrosContainer'];
             pantallas.forEach(p => document.getElementById(p).classList.add('hidden'));
@@ -204,17 +205,21 @@
             window.scrollTo(0,0);
         }
 
+        // CAMBIOS PARA LA MÚSICA DOS
         function irANosotros() {
+            detenerTodosLosAudios(); // Pausa amor.mp3
+            audios.dos.play();       // Inicia dos.mp3
             mostrarPantalla('nosotrosContainer');
             prepararCarrusel();
         }
 
         function irABonos() {
             clearInterval(autoplayInterval);
+            detenerTodosLosAudios(); // Pausa dos.mp3
+            audios.amor.play();      // Regresa a amor.mp3
             mostrarPantalla('aceptacionContainer');
         }
 
-        // 5. Lógica del Carrusel Animado
         function prepararCarrusel() {
             const carrusel = document.getElementById('carrusel');
             if (carrusel.children.length === 0) {
@@ -226,7 +231,6 @@
                 }
             }
             
-            // Iniciar movimiento automático
             clearInterval(autoplayInterval);
             autoplayInterval = setInterval(() => {
                 const scrollLeft = carrusel.scrollLeft;
@@ -238,7 +242,6 @@
                 }
             }, 3000);
 
-            // Actualizar contador al mover
             carrusel.addEventListener('scroll', () => {
                 const index = Math.round(carrusel.scrollLeft / carrusel.offsetWidth) + 1;
                 document.getElementById('contador').textContent = `Foto ${index} / 16`;
