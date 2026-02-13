@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¿Quieres ser mi San Valentín? 💕</title>
+    <title>¿Quieres ser mi San Valentín Mi Lucy hermosa? 💕</title>
     <style>
         * {
             margin: 0;
@@ -221,29 +221,24 @@
     </style>
 </head>
 <body>
-    <!-- Pantalla de pregunta -->
     <div class="pregunta-container" id="preguntaContainer">
         <div class="emoji">💕</div>
-        <h1>¿Quieres ser mi San Valentín Mi Lucy Hermosa?</h1>
+        <h1>¿Quieres ser mi San Valentín Mi lucy hermosa?</h1>
         <div class="botones">
             <button class="btn-si" onclick="aceptar()">SÍ 💖</button>
             <button class="btn-no" id="btnNo" onclick="rechazar()">NO</button>
         </div>
     </div>
 
-    <!-- Pantalla de GIF -->
     <div class="gif-container" id="gifContainer">
-    <h2>¡Como que no careñocla! 🥺</h2>
+        <h2>¡Ay nooo! 🥺</h2>
+        <img src="https://media1.tenor.com/m/fTTVgygGDh8AAAAC/sad-pepe-cry.gif" alt="Pepe Saf" style="max-width:90%; height:auto; margin-bottom:20px;">
+        <p style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
+            ¡Inténtalo de nuevo! 💔
+        </p>
+        <button onclick="volverAPregunta()">Volver a intentar</button>
+    </div>
 
-    <img src="https://media.tenor.com/m/fTTVgygGDh8AAAAC/sad-pepe-cry.gif" alt="Pepe Llorando" style="max-width:90%; height:auto; margin-bottom:20px;">
-
-    <p style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
-        ¡Inténtalo de nuevo! 💔
-    </p>
-    <button onclick="volverAPregunta()">Volver a intentar</button>
-</div>
-
-    <!-- Pantalla de aceptación -->
     <div class="aceptacion-container" id="aceptacionContainer">
         <div class="emoji">❤️</div>
         <div class="mensaje-amor">
@@ -286,9 +281,14 @@
         </div>
     </div>
 
+    <audio id="musicaTriste" loop>
+        <source src="esto-es-un-ratito.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         let contadorRechazos = 0;
         const btnNo = document.getElementById('btnNo');
+        const musica = document.getElementById('musicaTriste');
         
         function moverBotonNo() {
             const container = document.querySelector('.pregunta-container');
@@ -309,38 +309,40 @@
             contadorRechazos++;
             
             if (contadorRechazos >= 5) {
-                // Mostrar GIF después de 5 rechazos
+                // Mostrar GIF y activar música
                 document.getElementById('preguntaContainer').classList.add('hidden');
                 document.getElementById('gifContainer').classList.remove('hidden');
                 document.getElementById('gifContainer').classList.add('visible');
+                // Reproducir la canción al quinto rechazo
+                musica.play().catch(e => console.log("Error al reproducir audio:", e));
             } else {
-                // Mover el botón
                 moverBotonNo();
             }
         }
 
         function volverAPregunta() {
-            // Reiniciar contador
             contadorRechazos = 0;
+            // Detener música al volver
+            musica.pause();
+            musica.currentTime = 0;
             
-            // Resetear posición del botón NO
             btnNo.style.position = 'relative';
             btnNo.style.left = '0';
             btnNo.style.top = '0';
             
-            // Volver a la pantalla de pregunta
             document.getElementById('gifContainer').classList.add('hidden');
             document.getElementById('gifContainer').classList.remove('visible');
             document.getElementById('preguntaContainer').classList.remove('hidden');
         }
 
         function aceptar() {
-            // Ocultar pregunta y mostrar aceptación
+            // Detener música triste si suena
+            musica.pause();
+            
             document.getElementById('preguntaContainer').classList.add('hidden');
             document.getElementById('aceptacionContainer').classList.remove('hidden');
             document.getElementById('aceptacionContainer').classList.add('visible');
             
-            // Crear corazones cayendo
             crearCorazones();
         }
 
